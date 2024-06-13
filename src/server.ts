@@ -34,19 +34,16 @@ const CONF_MIDDLEWARE= {
 const VALIDATION_REQUEST = (err: any, req: any, res: any, next: any) => {
   const proxyHeader = req.headers['x-proxy-header'];
 
-  if(proxyHeader == 'secret-value') {
-    next();
-  } else {
-    console.log("entrou");
-    
-    res.status(403).send('Acesso negado.');
-  }
-
   if (err.name === "UnauthorizedError") {
     res.status(401).send("invalid token...");
   } else {
+    if(proxyHeader !== 'secret-value') {
+      res.status(403).send('Acesso negado.');
+    }
+
     next(err);
   }
+
 }
 router.use('/api/service-task', CHECK_JWT, createProxyMiddleware(CONF_MIDDLEWARE))
 
